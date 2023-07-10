@@ -20,8 +20,7 @@ const form = useForm({
     email: user.email,
     address: user.address || '',
     insurance_contact_name: user.insurance_contact_name,
-    phone: user.phone,
-    seller_reference: user.seller_reference
+    phone: user.phone
 });
 </script>
 
@@ -36,6 +35,7 @@ const form = useForm({
         </header>
 
         <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
+            {{$page.props.ziggy.url}}
             <div>
                 <InputLabel for="name" :value="$t('form.name') + ' *'" />
                 <TextInput id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" />
@@ -43,8 +43,7 @@ const form = useForm({
             </div>
             <div v-if="user.user_type === 'seller'">
                 <InputLabel for="email" :value="$t('form.seller_reference') + ' *'" />
-                <TextInput id="seller_reference" type="text" class="mt-1 block w-full" v-model="form.seller_reference" required autofocus autocomplete="username" />
-                <InputError class="mt-2" :message="form.errors.seller_reference" />
+                <TextInput id="seller_reference" type="text" class="mt-1 block w-full opacity-75" disabled :value="$page.props.ziggy.url + '?reference=' + user.seller_reference" required autofocus autocomplete="username" />
             </div>
             <div v-if="user.user_type === 'insurance_carrier'">
                 <InputLabel for="insurance_carrier" :value="$t('form.agency_contact') + ' *'" />

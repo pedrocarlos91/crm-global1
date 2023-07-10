@@ -17,7 +17,7 @@ class UserAdminSeeder extends Seeder
         DB::table('users')->insert([
             'name' => 'Administrador',
             'email' => 'admin@admin.com',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('Global1.23'),
             'user_type' => 'admin',
         ]);
     }

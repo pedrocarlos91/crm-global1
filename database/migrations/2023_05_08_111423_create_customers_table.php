@@ -13,34 +13,55 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->string('service');
             $table->string('name');
-            $table->string('lastname')->nullable();
+            $table->string('lastname');
             $table->string('phone')->nullable();
-            $table->string('email')->unique();
+            $table->string('businessPhone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('businessEmail')->nullable();
+            $table->string('company_name')->nullable();
             $table->string('city')->nullable();
-            $table->string('entity')->nullable();
-            $table->string('Horario de disponibilidad')->nullable();
-            $table->unsignedSmallInteger('service_types_id');
-            $table->json('services');
-            $table->unsignedBigInteger('seller_reference_id');
-            $table->string('number_ss_ninf_credit')->nullable();
-            $table->string('credit_score_credit_loans')->nullable();
-            $table->string('purpose_credit')->nullable();
-            $table->boolean('experian_account_credit')->nullable();
-            $table->string('experian_account_credentials_credit')->nullable();
-            $table->boolean('income_verification_loans')->nullable();
-            $table->string('loan_amount_loans')->nullable();
-            $table->unsignedSmallInteger('dependents_insurance')->nullable();
-            $table->string('dependents_ages_insurance')->nullable();
-            $table->string('inmigration_state_insurance')->nullable();
-            $table->boolean('medical_id_insurance')->nullable();
-            $table->boolean('smoke_insurance')->nullable();
-            $table->string('actual_insurance_insurance')->nullable();
-            $table->string('period_taxes')->nullable();
-            $table->string('comentaries')->nullable();
-
-
+            $table->string('regions_state_province')->nullable();
+            $table->string('like_be_contacted')->nullable();
+            $table->string('address')->nullable();
+            $table->string('zip_code')->nullable();
+            $table->string('house_hold_income')->nullable();
+            $table->string('how_many_dependents')->nullable();
+            $table->string('ages_dependents')->nullable();
+            $table->string('have_medicaid')->nullable();
+            $table->string('immigration_status')->nullable();
+            $table->string('approximate_credit_score')->nullable();
+            $table->string('personal_or_business_credit')->nullable();
+            $table->string('purpose_of_credit')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->string('do_you_smoke')->nullable();
+            $table->string('purpose')->nullable();
+            $table->json('type_of_services')->nullable();
+            $table->string('vin')->nullable();
+            $table->string('driver_licence')->nullable();
+            $table->string('interested_in')->nullable();
+            $table->string('year_of_vehicle')->nullable();
+            $table->string('monthly_premium')->nullable();
+            $table->string('insurance_for_six_months')->nullable();
+            $table->string('moving_violations')->nullable();
+            $table->string('accidents_five_years')->nullable();
+            $table->string('loan_amount_requesting')->nullable();
+            $table->string('type_of_loan')->nullable();
+            $table->string('type_of_taxes_service')->nullable();
+            $table->string('roof_age')->nullable();
+            $table->string('residence_home_status')->nullable();
+            $table->unsignedBigInteger('seller_id');
+            $table->unsignedSmallInteger('customer_status_id');
+            $table->unsignedBigInteger('agency_id')->nullable();
+            $table->string('verification')->nullable();
+            $table->string('comments')->nullable();
+            $table->string('locale')->nullable();
             $table->timestamps();
+
+            $table->foreign('seller_id')->references('id')->on('users');
+            $table->foreign('customer_status_id')->references('id')->on('customer_statuses');
+            $table->foreign('agency_id')->references('id')->on('users');
         });
     }
 

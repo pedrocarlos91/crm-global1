@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewSellerRegistered;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -15,7 +18,6 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO : Obtener el listado de usuariosm paginados
         $per_page = $request->input('per_page') ?? 5;
         $search = $request->input('search') ?? '';
 
@@ -54,9 +56,14 @@ class UsersController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return Inertia::render('Usuarios/UserCreate');
+        $type_user = $request->getRequestUri();
+        $findEndOfURL = (strpos($type_user, '?') -1 > 0) ? strpos($type_user, '?') -1 : strlen($type_user);
+        $type_user = substr($type_user, 1, $findEndOfURL);
+
+        if ($type_user === 'sellers/create') return Inertia::render('Usuarios/SellerCreate');
+        return Inertia::render('Usuarios/UserCreate', ['type_user' => $type_user]);
     }
 
     /**
@@ -69,25 +76,44 @@ class UsersController extends Controller
             'email' => 'required | unique:users',
             'phone' => 'required',
             'insurance_contact_name' => [Rule::requiredIf($request->input('user_type') === 'insurance_carrier')],
-            'seller_reference' => [Rule::requiredIf($request->input('user_type') === 'seller'), 'nullable','unique:users'],
             'user_type' => 'required',
             'password' => 'required'
         ]);
+        $data = $request->all();
+
+        if ($data['user_type'] === 'seller') {
+            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_';
+            do{
+                $seller_reference = substr(str_shuffle($permitted_chars), 0, 10);
+                $seller = User::where('seller_reference', $seller_reference)->first();
+            }while(isset($seller));
+        } else {
+            $seller_reference = null;
+        }
+
         try {
             $user = new User();
-            $user->name = $request->input('name');
-            $user->email = $request->input('email');
-            $user->phone = $request->input('phone');
-            $user->address = $request->input('address');
-            $user->insurance_contact_name = $request->input('insurance_contact_name');
-            $user->seller_reference = $request->input('seller_reference');
-            $user->user_type = $request->input('user_type');
-            $user->password = Hash::make($request->input('password'));
+            $user->name = $data['name'];
+            $user->email = $data['email'];
+            $user->phone = $data['phone'];
+            $user->address = $data['address'];
+            $user->insurance_contact_name = $data['insurance_contact_name'];
+            $user->seller_reference = $seller_reference;
+            $user->user_type = $data['user_type'];
+            $user->password = Hash::make($data['password']);
             $user->save();
+            if ($user->user_type === 'seller') {
+                $send = User::where('user_type', 'admin')->select('email', 'name')->get()->toArray();
+                Mail::to($send)->send(new NewSellerRegistered($user, 'admin'));
+                Mail::to($user->email)->send(new NewSellerRegistered($user, 'seller'));
+                return redirect('/login');
+            }
         } catch (\Exception $e) {
 //            return response()->withErrors(['message_error_user'=> 'No se creó el usuario: '. $e->getMessage()]);
             return 'No se pudo crear el usuario. ' . $e->getMessage();
         }
+
+
         return redirect()->route('users.index');
     }
 
@@ -104,7 +130,8 @@ class UsersController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::find($id);
+        return Inertia::render('Usuarios/EditUser', ['user' => $user]);
     }
 
     /**
@@ -112,7 +139,11 @@ class UsersController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::find($id);
+        $data = $request->all();
+        $user->update($data);
+        return redirect()->back()->with(['message', 'información actualizada']);
+
     }
 
     /**
@@ -120,6 +151,15 @@ class UsersController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::find($id);
+        $user->delete();
+        return redirect()->back();
+    }
+    public function changeActivate(Request $request)
+    {
+        $user = User::find($request->input('user_id'));
+        $user->is_active = !$user->is_active;
+        $user->save();
+        return redirect()->back();
     }
 }

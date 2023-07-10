@@ -1,15 +1,14 @@
 <template>
     <aside
         :class="sidebarToggle ? 'translate-x-0' : '-translate-x-full'"
-        class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-gray-800 duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0"
+        class="absolute left-0 top-0 z-50 flex h-screen w-72.5 flex-col overflow-y-hidden bg-gray-800 duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0"
     >
         <!-- SIDEBAR HEADER -->
         <div class="flex items-center justify-between gap-2 px-6 py-6 lg:py-7">
-            <div class="flex">
-                <a href="index.html">
-                    <ApplicationLogo class="h-10 fill-current text-gray-500" />
+            <div class="mb-10">
+                <a :href="route('customers.index')" class="absolute left-1/3">
+                    <ApplicationLogo class="h-20 fill-current text-gray-500 " />
                 </a>
-                <span class="ml-4 text-white pt-2">Global 1 Pro</span>
             </div>
             <button
                 class="block lg:hidden"
@@ -46,13 +45,15 @@
                     <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">MENU</h3>
                     <ul class="mb-6 flex flex-col gap-1.5">
                         <li v-for="page in pages">
-                            <a :href="page.route"
-                               class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
-                               :class="{'bg-graydark': $page.url.startsWith(page.startsWith)}"
-                            >
-                                <span><i :class="page.icon"></i></span>
-                                {{ $t(page.title) }}
-                            </a>
+                            <div v-if="$page.props.auth.user.user_type === 'admin' || !page.isAdmin">
+                                <a :href="page.route"
+                                   class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                   :class="{'bg-graydark': $page.url.startsWith(page.startsWith)}"
+                                >
+                                    <span><i :class="page.icon"></i></span>
+                                    {{ $t(page.title) }}
+                                </a>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -71,7 +72,7 @@ export default {
     name: "Sidebar",
     components: {ApplicationLogo},
     props: {
-        sidebarToggle: Boolean,
+        sidebarToggle: Boolean
     },
     data() {
         return {

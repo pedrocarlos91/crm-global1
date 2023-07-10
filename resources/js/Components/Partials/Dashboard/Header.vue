@@ -1,6 +1,6 @@
 <template>
     <header
-        class="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none"
+        class="sticky top-0 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none"
     >
         <div
             class="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11"
@@ -45,7 +45,7 @@
                     class="block flex-shrink-0 lg:hidden"
                     :href="route('dashboard')"
                 >
-                    <ApplicationLogo class="h-8 fill-current text-gray-500" />
+                    <ApplicationLogo class="h-12 fill-current text-gray-500" />
                 </a>
             </div>
             <div></div>
